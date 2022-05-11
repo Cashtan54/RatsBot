@@ -18,10 +18,15 @@ def start(m):
 
 @bot.message_handler(content_types=['text'])
 def find_food(m):
-    with open(r'\RatsFoodMapBot\data\food.csv', 'r', encoding='utf-8', newline='') as file:
+    with open(r'\RatsBot\data\food.csv', 'r', encoding='utf-8', newline='') as file:
         food_from_user = m.text.lower()
         data = csv.reader(file, dialect='excel')
-        search_in_google(m.chat.id, food_from_user)
+        for food, description in data:
+            if food_from_user in food:
+                bot.send_message(m.chat.id, description)
+                break
+        else:
+            search_in_google(m.chat.id, food_from_user)
 
 
 def search_in_google(user, food_from_user):
@@ -31,13 +36,10 @@ def search_in_google(user, food_from_user):
 
 
 def check_user(id, username):
-    with open(r'\RatsFoodMapBot\data\users.txt', 'a+', encoding='utf-8') as file:
+    with open(r'\RatsBot\data\users.txt', 'r+', encoding='utf-8') as file:
         users = file.readlines()
-        for user in users:
-            if user.split()[0] == id:
-                break
-        else:
-            print(f'{id} {username}', file=file)
+        if f'{id} {username}\n' not in users:
+            file.write(f'{id} {username}\n')
 
 
 bot.infinity_polling()
