@@ -1,5 +1,6 @@
 import telebot
 import csv
+import os
 
 bot = telebot.TeleBot('5382174532:AAEuJdwo300DfHgwMQn-Y20_hq0AwMjC6ak')
 google_search = 'https://www.google.com/search?q=Можно+ли+крысам+'
@@ -18,7 +19,7 @@ def start(m):
 
 @bot.message_handler(content_types=['text'])
 def find_food(m):
-    with open(r'\RatsBot\data\food.csv', 'r', encoding='utf-8', newline='') as file:
+    with open(f'{os.path.dirname(os.getcwd())}\\data\\food.csv', 'r', encoding='utf-8', newline='') as file:
         food_from_user = m.text.lower()
         data = csv.reader(file, dialect='excel')
         for food, description in data:
