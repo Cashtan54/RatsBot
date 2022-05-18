@@ -1,6 +1,5 @@
 import telebot
 import csv
-import os
 
 bot = telebot.TeleBot('5382174532:AAEuJdwo300DfHgwMQn-Y20_hq0AwMjC6ak')
 google_search = 'https://www.google.com/search?q=Можно+ли+крысам+'
@@ -19,7 +18,7 @@ def start(m):
 
 @bot.message_handler(content_types=['text'])
 def find_food(m):
-    with open(f'{os.path.dirname(os.getcwd())}\\data\\food.csv', 'r', encoding='utf-8', newline='') as file:
+    with open('food.csv', 'r', encoding='utf-8', newline='') as file:
         food_from_user = m.text.lower()
         data = csv.reader(file, dialect='excel')
         for food, description in data:
@@ -37,7 +36,7 @@ def search_in_google(user, food_from_user):
 
 
 def check_user(id, username):
-    with open(f'{os.path.dirname(os.getcwd())}\\data\\users.txt', 'r+', encoding='utf-8') as file:
+    with open('users.txt', 'r+', encoding='utf-8') as file:
         users = file.readlines()
         if f'{id} {username}\n' not in users:
             file.write(f'{id} {username}\n')
