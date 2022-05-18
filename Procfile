@@ -1,1 +1,1 @@
-worker: python main\food_map_bot.py
+worker: python \main\food_map_bot.py
