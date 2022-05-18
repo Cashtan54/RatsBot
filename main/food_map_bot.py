@@ -37,7 +37,7 @@ def search_in_google(user, food_from_user):
 
 
 def check_user(id, username):
-    with open(r'\RatsBot\data\users.txt', 'r+', encoding='utf-8') as file:
+    with open(f'{os.path.dirname(os.getcwd())}\\data\\users.txt', 'r+', encoding='utf-8') as file:
         users = file.readlines()
         if f'{id} {username}\n' not in users:
             file.write(f'{id} {username}\n')
