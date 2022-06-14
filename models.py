@@ -18,5 +18,5 @@ class Food(BaseModel):
 
 class User(BaseModel):
     username = CharField(unique=True)
-    user_tg_id = CharField()
+    user_tg_id = IntegerField()
     start_time = DateTimeField(default=datetime.now())

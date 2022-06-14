@@ -4,7 +4,7 @@ from db import *
 bot = telebot.TeleBot('5382174532:AAEuJdwo300DfHgwMQn-Y20_hq0AwMjC6ak')
 google_search = 'https://www.google.com/search?q=Можно+ли+крысам+'
 admin_username = 'cashtan54'
-admin_id = '408871919'
+admin_id = 408871919
 
 
 @bot.message_handler(commands=['start'])
@@ -17,6 +17,13 @@ def start(m):
     add_user(m.from_user.username, m.from_user.id)
 
 
+@bot.message_handler(commands=['add_food'])
+def admin_add_food(m):
+    if m.from_user.id == admin_id:
+        sent = bot.send_message(m.chat.id, 'Enter food name to add:\nname\nis_allowed 0 or 1\ndescription')
+        bot.register_next_step_handler(sent, add_food)
+
+
 @bot.message_handler(content_types=['text'])
 def find_food(m):
     food_from_user = m.text.lower()
@@ -27,10 +34,15 @@ def find_food(m):
         search_in_google(m.chat.id, food_from_user)
 
 
-@bot.message_handler(commands=['add_food'])
 def add_food(m):
-    if m.from_user.id == admin_id:
-        bot.send_message(m.chat.id, 'Enter food name to add')
+    food = m.text.split('\n')
+    food_to_db = Food(
+        name=food[0],
+        is_allowed=(food[1] == '1'),
+        description=food[2],
+    )
+    food_to_db.save()
+    bot.send_message(admin_id, 'success')
 
 
 def search_in_google(user, food_from_user):
