@@ -13,8 +13,22 @@ def start(m):
                      'Добро пожаловать!\nЭтот бот поможет Вам составить карту питания для Ваших крыс.')
     bot.send_message(m.chat.id, 'Для того, чтобы узнать, можно ли крысам тот или иной продукт, '
                                 'просто введите его название. Например: Помидоры.\n'
-                                'Если такого продукта в нашей базе нет, бот поищет ответ в интернете.')
+                                'Если такого продукта в нашей базе нет, бот поищет ответ в интернете.\n'
+                                'Для получения полного списка команд нажмите /help')
     add_user(m.from_user.username, m.from_user.id)
+
+
+@bot.message_handler(commands=['help'])
+def help(m):
+    text_for_admin = '/allowed - список всех разрешенных продуктов\n' \
+                     '/not_allowed - список всех запрещенных продуктов\n' \
+                     '/add_food - добавить еду в бд'
+    text_for_user = '/allowed - список всех разрешенных продуктов\n' \
+                    '/not_allowed - список всех запрещенных продуктов\n'
+    if m.from_user.id == admin_id:
+        bot.send_message(m.chat.id, text_for_admin)
+    else:
+        bot.send_message(m.chat.id, text_for_user)
 
 
 @bot.message_handler(commands=['add_food'])
@@ -22,6 +36,22 @@ def admin_add_food(m):
     if m.from_user.id == admin_id:
         sent = bot.send_message(m.chat.id, 'Enter food name to add:\nname\nis_allowed 0 or 1\ndescription')
         bot.register_next_step_handler(sent, add_food)
+
+
+@bot.message_handler(commands=['allowed'])
+def allowed_food(m):
+    _allowed_food = list()
+    for food in Food.select().where(Food.is_allowed == True):
+        _allowed_food.append(food.name)
+    bot.send_message(m.chat.id, '\n'.join(_allowed_food))
+
+
+@bot.message_handler(commands=['not_allowed'])
+def not_allowed_food(m):
+    _not_allowed_food = list()
+    for food in Food.select().where(Food.is_allowed == False):
+        _not_allowed_food.append(food.name)
+    bot.send_message(m.chat.id, '\n'.join(_not_allowed_food))
 
 
 @bot.message_handler(content_types=['text'])
