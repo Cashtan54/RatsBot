@@ -1,7 +1,7 @@
 import telebot
 from db import *
 
-bot = telebot.TeleBot('5382174532:AAEuJdwo300DfHgwMQn-Y20_hq0AwMjC6ak')
+bot = telebot.TeleBot('token')
 google_search = 'https://www.google.com/search?q=Можно+ли+крысам+'
 admin_username = 'cashtan54'
 admin_id = 408871919
