@@ -1,9 +1,8 @@
 import telebot
+from telebot.types import ReplyKeyboardMarkup as RKM, InlineKeyboardButton as IKB
 from db import *
 
 bot = telebot.TeleBot('token')
-google_search = 'https://www.google.com/search?q=Можно+ли+крысам+'
-admin_username = 'cashtan54'
 admin_id = 408871919
 
 
@@ -14,10 +13,18 @@ def start(m):
     bot.send_message(m.chat.id, 'Для того, чтобы узнать, можно ли крысам тот или иной продукт, '
                                 'просто введите его название. Например: Помидоры.\n'
                                 'Если такого продукта в нашей базе нет, бот поищет ответ в интернете.\n'
-                                'Для получения полного списка команд нажмите /help')
+                                'Для получения полного списка команд нажмите /help', reply_markup=keyboard())
     add_user(m.from_user.username, m.from_user.id)
 
 
+def keyboard():
+    kb = RKM(resize_keyboard=True)
+    b1 = IKB('Help')
+    kb.add(b1)
+    return kb
+
+
+@bot.message_handler(regexp='Help')
 @bot.message_handler(commands=['help'])
 def help(m):
     text_for_admin = '/allowed - список всех разрешенных продуктов\n' \
@@ -42,7 +49,7 @@ def admin_add_food(m):
 def allowed_food(m):
     _allowed_food = list()
     for food in Food.select().where(Food.is_allowed == True):
-        _allowed_food.append(food.name)
+        _allowed_food.append(food.name.capitalize())
     bot.send_message(m.chat.id, '\n'.join(_allowed_food))
 
 
@@ -50,7 +57,7 @@ def allowed_food(m):
 def not_allowed_food(m):
     _not_allowed_food = list()
     for food in Food.select().where(Food.is_allowed == False):
-        _not_allowed_food.append(food.name)
+        _not_allowed_food.append(food.name.capitalize())
     bot.send_message(m.chat.id, '\n'.join(_not_allowed_food))
 
 
@@ -65,17 +72,21 @@ def find_food(m):
 
 
 def add_food(m):
-    food = m.text.split('\n')
-    food_to_db = Food(
-        name=food[0],
-        is_allowed=(food[1] == '1'),
-        description=food[2],
-    )
-    food_to_db.save()
-    bot.send_message(admin_id, 'success')
+    try:
+        food = m.text.split('\n')
+        food_to_db = Food(
+            name=food[0],
+            is_allowed=(food[1] == '1'),
+            description=food[2],
+        )
+        food_to_db.save()
+        bot.send_message(admin_id, 'success')
+    except ValueError:
+        pass
 
 
 def search_in_google(user, food_from_user):
+    google_search = 'https://www.google.com/search?q=Можно+ли+крысам+'
     bot.send_message(user,
                      f'<a href="{google_search}{food_from_user}">{food_from_user}</a>',
                      parse_mode='HTML')
